@@ -7,7 +7,7 @@ import torch
 # im on mac m2
 mps_device = torch.device("mps")
 
-my_tensor = torch.tensor([[1, 2, 3], 
+my_tensor = torch.tensor([[1, 1, 3], 
                          [4, 5, 6]], dtype=torch.float32, device="mps") # requires_grad=True, device="mps" are other params
 
 # some attributes of a torch.tensor
@@ -36,6 +36,110 @@ print(x)
 #       CASTING TENSOR TYPES     #
 #================================#
 
+tensor = torch.arange(4) # start = 0 by def., step=1 by def.
+print(tensor.bool()) # works on CUDA and CPU, 0 = False, rest = True
+print(tensor.short()) # to short
+print(tensor.half()) # to float16
+print(tensor.float()) # to float32 (important)
+print(tensor.double()) # to double/float64
+
+# array to tensor conversion and vice versa
+import numpy as np
+
+np_array = np.zeros((5, 5))
+tensor = torch.from_numpy(np_array) # convert np array to tensor
+np_array_back = tensor.numpy() # convert back to np array
 
 
+#========================================#
+#       TENSOR MATH & COMPARISON OPS     #
+#========================================#
 
+x = torch.tensor([1, 2, 3])
+y = torch.tensor([9, 8, 7])
+
+# Addition
+z1 = torch.empty(3)
+torch.add(x, y, out=z1) # Method 1
+z2 = torch.add(x, y) # Method 2
+z = x + y # Method 3
+
+# Subtraction
+z = x - y
+
+# Division
+z = torch.true_divide(x, y) # divide each item in x by corresponding item in y
+z = torch.true_divide(x, 2) # divide all items in x by 2
+print(z)
+
+# inplace operations ("{ops}_" indicate inplace)
+t = torch.zeros(3)
+t.add_(x) # inplace ops, no need for other var so more efficient
+t += x # inplace too but t = t + x is not inplace
+
+# Exponentiation
+z = x.pow(2)
+z = x ** 2
+print(z)
+
+# Simple comparison
+z = x > 0
+z = x < 0
+print(z) # element wise comparison
+
+# Matrix multiplication
+x1 = torch.rand((2, 5))
+x2 = torch.rand((5, 3))
+x3 = torch.mm(x1, x2) # 2x3
+x3 = x1.mm(x2) # works too
+
+
+# Matrix exponentiation (raise entire matrix)
+matrix_exp = torch.rand(5, 5)
+print(matrix_exp.matrix_power(3))
+
+# Element wise multiplication
+z = x * y 
+print(z)
+
+# Dot product
+z = torch.dot(x, y)
+print(z)
+
+# Batch Matrix Multiplication (more efficient)
+batch = 32
+n = 10
+m = 20
+p = 30
+
+tensor1 = torch.rand((batch, n, m))
+tensor2 = torch.rand((batch, m, p)) # dim 
+out_bmm = torch.bmm(tensor1, tensor2) # (batch, n, p)
+print(out_bmm)
+
+# Broadcasting
+x1 = torch.ones((5, 5))
+x2 = torch.ones((1, 5))
+
+z = x1 - x2 # How is that possible?? Expand x2's dim to match x1 automatically
+print(z)
+
+# Other useful tensor ops
+sum_x = torch.sum(x, dim=0)
+values, indices = torch.max(x, dim=0) # gives val and pos of max, 1st occurence
+values, indices = torch.min(x, dim=0) # gives val and pos of min, 1st occurence
+abs_x = torch.abs(x)  # element wise abs value
+z = torch.argmax(x, dim=0) # gives min value
+z = torch.argmin(x, dim=0) # gives max value
+mean_x = torch.mean(x.float(), dim=0) # returns scalar mean
+z = torch.eq(x, y) # check element wise if elements are equal 
+sorted_y, indices = torch.sort(y, dim=0, descending=False) # sorted tensor + new indices order
+z = torch.clamp(x, min=0, max=10) # if value below 0, set to 0, if value > 10, set to 10
+
+x = torch.tensor([1, 0, 1, 1], dtype=torch.bool) # bool tensor
+z = torch.any(x) # True
+z = torch.all(x) # False, we have one 0
+
+#========================================#
+#            TENSOR INDEXING             #
+#========================================#
