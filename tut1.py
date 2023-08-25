@@ -143,3 +143,83 @@ z = torch.all(x) # False, we have one 0
 #========================================#
 #            TENSOR INDEXING             #
 #========================================#
+
+batch_size = 10
+features = 25
+x = torch.rand((batch_size, features))
+
+print(x[0].shape) # x[0,:], all features of first example/batch
+print(x[:, 0].shape) # x[:, 0] first feature of all our examples, ":" means all
+# out:
+# torch.Size([25])
+# torch.Size([10])
+print(x[2, 0:10]) # get 10 first features of the 2nd example
+
+# set the val of the tensor at an index
+x[0, 0] = 100
+
+# Fancy indexing
+x = torch.arange(10)
+indices = [2, 5, 8]
+print(x[indices]) # pick 3 elements from x: 3rd pos, 6th pos and 9th pos
+# out: tensor([2, 5, 8])
+
+x = torch.rand(3, 5)
+rows = torch.tensor([1, 0])
+cols = torch.tensor([4, 0])
+print(x)
+print(x[rows, cols]) # looks for x[1, 4] and x[0, 0]
+# out: torch.Size([2])
+
+# More advanced indexing
+x = torch.arange(10)
+print(x[(x < 2) | (x >8)]) # elems of x at pos 0, 1 and 9
+print(x[x.remainder(2) == 0]) # keep only even numbers
+# out: tensor([0, 2, 4, 6, 8])
+
+# Useful ops
+print(torch.where(x > 5, x, x*2)) # check elemt wise if > 5, if yes, let it as is, else multiply it by 2
+# out: tensor([ 0,  2,  4,  6,  8, 10,  6,  7,  8,  9])
+
+print(torch.tensor([0,0,1,1,2,4]).unique()) # remove duplicates
+print(x.ndimension()) # out: 1 since only one dim
+print(x.numel()) # len num of elements in x
+
+
+#========================================#
+#            TENSOR RESHAPING            #
+#========================================#
+
+x = torch.arange(9)
+
+x_3x3 = x.view(3, 3) # Method 1: for contiguous tensor
+x_3x3 = x.reshape(3, 3) # Method 2: safer, handle both cases
+print(x_3x3.shape)
+
+y = x_3x3.t() # do the transpose, not contiguous here
+
+x1 = torch.rand((2, 5))
+x2 = torch.rand((2, 5))
+print(torch.cat((x1, x2), dim=0).shape)
+# out: torch.Size([4, 5])
+z = x1.view(-1) # flatten tensor
+print(z)
+
+batch = 64
+x = torch.rand((batch, 2, 5))
+z = x.view(batch, -1) # just flatten the 2, 5 part
+print(z.shape)
+# out: torch.Size([64, 10])
+
+# swap axis
+z = x.permute(0, 2, 1) # swap dim 2 (5) with dim 1 (2 up here)
+print(z.shape)
+
+x = torch.arange(10) # dim 10 rn, we want dim 1x10
+print(x.unsqueeze(0).shape) # out: torch.Size([1, 10])
+
+x = torch.arange(10).unsqueeze(0).unsqueeze(1) # 1x1x10
+
+z = x.squeeze(1)
+print(z.shape)
+# out: torch.Size([1, 10])
