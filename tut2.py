@@ -28,7 +28,6 @@ print(model(x).shape) # we want output to be 64x10, prob of each classes for eac
 # Set device
 device = torch.device("mps" if torch.has_mps else 'cpu')
 
-
 # Hyperparameters
 input_size = 784
 num_classes = 10
@@ -51,4 +50,3 @@ model = NN(input_size=input_size, num_classes=num_classes).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters, lr=learning_rate)
 
-# Train network
