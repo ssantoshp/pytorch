@@ -50,3 +50,49 @@ model = NN(input_size=input_size, num_classes=num_classes).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters, lr=learning_rate)
 
+# Train Network
+for epoch in range(num_epochs):
+    for batch_idx, (data, targets) in enumerate(train_loader):
+        # Get data to mps if possible
+        data = data.to(device=device)
+        targets = targets.to(device=device)
+        
+        # Get to correct shape
+        data = data.reshape(data.shape[0], -1)
+
+        # forward
+        scores = model(data)
+
+        # Get accuracy
+        loss = criterion(scores, targets)
+
+        # backward
+        optimizer.zero_grad() # set all gradients to 0 for each batch
+        loss.backward()
+
+        # take gradient descent or adam step
+        optimizer.step()
+
+# Check accuracy on training & test of model
+def check_accuracy(loader, model):
+    num_correct = 0
+    num_samples = 0
+    model.eval()
+
+    with torch.no_grad():
+        for x, y in loader:
+            x = x.to(device=device)
+            y = y.to(device=device)
+            x = x.reshape(x.shape[0], -1)
+
+            scores = model(x)
+            _, predictions = scores.max(1)
+            num_correct += (predictions == y).sum()
+            num_samples += predictions.size(0)
+
+        print(f'Got {num_correct}/{num_samples} with accuracy {float(num_correct)/float(num_samples)*100:.2f}')
+    
+    model.train()
+
+check_accuracy(train_loader, model)
+check_accuracy(test_loader, model)
