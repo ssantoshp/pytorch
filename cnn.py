@@ -36,9 +36,6 @@ class CNN(nn.Module):
       x = self.fc1(x)
       return x
 
-
-model = CNN()
-
 '''
 model = NN(784, 10) # 28*28 = 784, 10 digits/classes
 x = torch.randn(64, 784) # 64 examples
